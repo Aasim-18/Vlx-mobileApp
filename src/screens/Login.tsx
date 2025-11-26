@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState} from 'react';
+import axios from 'axios';
 import {
   StyleSheet,
   Text,
@@ -11,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert
 } from 'react-native';
 
 
@@ -21,7 +23,6 @@ import {RootStackPramList} from "../App"
 
 type LoginProps = NativeStackScreenProps<RootStackPramList, "Login">
 
-// --- Theme Constants ---
 const COLORS = {
   primary: '#6C63FF',
   background: '#0F172A',
@@ -32,7 +33,43 @@ const COLORS = {
 };
 
 export default function LoginScreen({navigation}: LoginProps) {
-  // Animation Values
+
+  const handleLogin = async () => {
+  try {
+    const response = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/login",
+        {
+          
+          email,
+          password,
+          EnrollmentNumber,
+          
+        }
+      );
+        console.log(response);
+        
+      Alert.alert("Success", "you are loggedIN successfully!", [
+        { text: "OK" },
+      ]);
+  } catch (error) {
+    console.log(error);
+    
+  }
+
+  }
+
+
+
+
+   const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [EnrollmentNumber, setEnrollmentNumber] = useState("");
+
+
+
+
+
+  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -91,6 +128,19 @@ export default function LoginScreen({navigation}: LoginProps) {
                 placeholderTextColor={COLORS.textSecondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                onChangeText={setEmail}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Enrollment Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="BT25MMEXXX"
+                placeholderTextColor={COLORS.textSecondary}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={setEnrollmentNumber}
               />
             </View>
 
@@ -101,35 +151,21 @@ export default function LoginScreen({navigation}: LoginProps) {
                 placeholder="••••••••"
                 placeholderTextColor={COLORS.textSecondary}
                 secureTextEntry
+                onChangeText={setPassword}
               />
-              <TouchableOpacity style={styles.forgotBtn}>
-                <Text style={styles.forgotText}>Forgot?</Text>
-              </TouchableOpacity>
+              
             </View>
 
             <TouchableOpacity 
               style={styles.primaryBtn}
               activeOpacity={0.8}
+              onPress={handleLogin}
             >
               <Text style={styles.primaryBtnText}>Sign In</Text>
             </TouchableOpacity>
 
             {/* Social Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Social Buttons */}
-            <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Text style={styles.socialBtnText}>G</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Text style={styles.socialBtnText}></Text>
-              </TouchableOpacity>
-            </View>
+            
           </Animated.View>
 
           {/* Footer */}

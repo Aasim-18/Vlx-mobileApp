@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar,  Animated, KeyboardAvoidingView, Platform, ScrollView,
+  StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Alert, StatusBar,  Animated, KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 
-
+import axios from 'axios';
 import {NativeStackScreenProps} from "@react-navigation/native-stack"
 import {RootStackPramList} from "../App"
 
@@ -23,7 +23,45 @@ const COLORS = {
 };
  
 export default function Signup({navigation}: SignupProps) {
-  // Animation Values
+
+  const [fullName, setfullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [EnrollmentNumber, setEnrollmentNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+
+
+  const handleSignup = async () => {
+    try {
+       const response = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/register",
+        {
+          fullName,
+          email,
+          password,
+          EnrollmentNumber,
+          phoneNumber,
+        }
+      );
+        console.log(response);
+        
+      Alert.alert("Success", "Account created successfully!", [
+        { text: "OK" },
+      ]);
+    } catch (error) {
+      console.log(error);
+      
+    }
+
+
+
+  }
+
+
+
+
+  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -52,7 +90,7 @@ export default function Signup({navigation}: SignupProps) {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           
-          {/* Header */}
+          
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Text style={styles.logoText}>VLX</Text>
@@ -60,11 +98,11 @@ export default function Signup({navigation}: SignupProps) {
             </View>
             <Text style={styles.welcomeText}>Create Account</Text>
             <Text style={styles.subtitleText}>
-              Join Vlx today and start your journey.
+              Join Vlx today and Sell your Products Easily
             </Text>
           </View>
 
-          {/* Form */}
+          
           <Animated.View 
             style={[
               styles.formContainer,
@@ -81,6 +119,18 @@ export default function Signup({navigation}: SignupProps) {
                 placeholder="John Doe"
                 placeholderTextColor={COLORS.textSecondary}
                 autoCapitalize="words"
+                onChangeText={setfullName}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Enrollment Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="BT25MMEXXX"
+                placeholderTextColor={COLORS.textSecondary}
+                autoCapitalize="words"
+                onChangeText={setEnrollmentNumber}
               />
             </View>
 
@@ -88,10 +138,22 @@ export default function Signup({navigation}: SignupProps) {
               <Text style={styles.label}>Email Address</Text>
               <TextInput
                 style={styles.input}
-                placeholder="name@example.com"
+                placeholder="name@vnit.ac.in"
                 placeholderTextColor={COLORS.textSecondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                onChangeText={setEmail}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Phone Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="+91"
+                placeholderTextColor={COLORS.textSecondary}
+                keyboardType="phone-pad"
+                autoCapitalize="none"
+                onChangeText={setPhoneNumber}
               />
             </View>
 
@@ -102,35 +164,20 @@ export default function Signup({navigation}: SignupProps) {
                 placeholder="••••••••"
                 placeholderTextColor={COLORS.textSecondary}
                 secureTextEntry
+                onChangeText={setPassword}
               />
             </View>
 
             <TouchableOpacity 
               style={styles.primaryBtn}
               activeOpacity={0.8}
+              onPress={handleSignup}
             >
               <Text style={styles.primaryBtnText}>Sign Up</Text>
             </TouchableOpacity>
-
-            {/* Social Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Social Buttons */}
-            <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Text style={styles.socialBtnText}>G</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Text style={styles.socialBtnText}></Text>
-              </TouchableOpacity>
-            </View>
           </Animated.View>
 
-          {/* Footer */}
+          
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>

@@ -23,13 +23,10 @@ function App() {
 
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName='Signup'>
+    <Stack.Navigator initialRouteName='Signup' screenOptions={{ headerShown: false }}>
     <Stack.Screen 
         name="Signup"
         component={Signup}
-        options={{
-          title: "Trending Products"
-        }}
         />
         <Stack.Screen 
          name='Login'

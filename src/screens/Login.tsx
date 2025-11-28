@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import {
   StyleSheet,
@@ -15,60 +15,82 @@ import {
   Alert
 } from 'react-native';
 
-
-
 import {NativeStackScreenProps} from "@react-navigation/native-stack"
 import {RootStackPramList} from "../App"
 
-
 type LoginProps = NativeStackScreenProps<RootStackPramList, "Login">
 
+// UPDATED: GetKart Theme Colors
 const COLORS = {
-  primary: '#6C63FF',
-  background: '#0F172A',
-  surface: '#1E293B',
-  text: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  inputBg: '#334155',
+  primary: '#FF9F1C',      // GetKart Orange
+  background: '#FFFFFF',   // White background
+  surface: '#F8F9FA',      // Light gray
+  text: '#1A1A1A',         // Black/Dark Grey
+  textSecondary: '#757575',// Muted gray
+  inputBg: '#FFFFFF',      // White inputs
+  inputBorder: '#E0E0E0',  // Light border
+  shadow: '#000000',
 };
 
 export default function LoginScreen({navigation}: LoginProps) {
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [EnrollmentNumber, setEnrollmentNumber] = useState("");
+
   const handleLogin = async () => {
-  try {
-    const response = await axios.post(
+    try {
+      const response = await axios.post(
         "https://vlx-server.onrender.com/api/v1/users/login",
         {
-          
           email,
           password,
           EnrollmentNumber,
-          
         }
       );
-        console.log(response);
-        
-      Alert.alert("Success", "you are loggedIN successfully!", [
+      console.log(response);
+      
+      Alert.alert("Success", "You are logged in successfully!", [
         { text: "OK" },
       ]);
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Login failed. Please check your credentials.");
+    }
+  }
+
+
+  const generateOtp = async () => {
+  
+    if (!email) {
+      Alert.alert("Error", "Please enter your email address.");
+      return false; 
+    }
+
+    try {
+      
+      const response = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/Otpgenerate",
+        {  email } 
+      );
+
+      
     
+      if (response.status === 200 || response.status === 201) {
+        console.log("Server Response:", response.data); 
+        return true; 
+      } else {
+        Alert.alert("Error", "Something went wrong.");
+        return false;
+      }
+
+    } catch (error) {
+    
+      console.log("OTP Error:", error);
+      Alert.alert("Error", "Failed to generate OTP. Please try again.");
+      return false; 
+    }
   }
-
-  }
-
-
-
-
-   const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [EnrollmentNumber, setEnrollmentNumber] = useState("");
-
-
-
-
-
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -90,7 +112,8 @@ export default function LoginScreen({navigation}: LoginProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      {/* Updated Status Bar for Light Theme */}
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -138,7 +161,6 @@ export default function LoginScreen({navigation}: LoginProps) {
                 style={styles.input}
                 placeholder="BT25MMEXXX"
                 placeholderTextColor={COLORS.textSecondary}
-                keyboardType="email-address"
                 autoCapitalize="none"
                 onChangeText={setEnrollmentNumber}
               />
@@ -153,19 +175,26 @@ export default function LoginScreen({navigation}: LoginProps) {
                 secureTextEntry
                 onChangeText={setPassword}
               />
-              
             </View>
+
+            {/* Forgot Password Link */}
+            <TouchableOpacity style={{alignSelf: 'flex-end', marginBottom: 20}}>
+                <Text style={styles.forgotText}>Forgot Password?</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.primaryBtn}
               activeOpacity={0.8}
-              onPress={handleLogin}
+              onPress={async () => {
+                await handleLogin();
+               await  generateOtp();
+
+                navigation.navigate("EmailVerify");
+              }}
             >
               <Text style={styles.primaryBtnText}>Sign In</Text>
             </TouchableOpacity>
 
-            {/* Social Divider */}
-            
           </Animated.View>
 
           {/* Footer */}
@@ -199,19 +228,19 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   logoText: {
     fontSize: 42,
-    fontWeight: '800',
-    color: COLORS.primary,
-    letterSpacing: 2,
+    fontWeight: '900',
+    color: COLORS.text, // Black
+    letterSpacing: -1,
   },
   logoDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.text,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.primary, // Orange
     marginLeft: 4,
   },
   welcomeText: {
@@ -231,13 +260,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-    fontWeight: '500',
+    color: COLORS.text, // Darker label
+    marginBottom: 6,
+    fontWeight: '600',
+    marginLeft: 4,
   },
   input: {
     backgroundColor: COLORS.inputBg,
@@ -246,78 +276,43 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     color: COLORS.text,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  forgotBtn: {
-    position: 'absolute',
-    right: 0,
-    top: -28,
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
+    // Soft shadow for depth (like search bar)
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   forgotText: {
     color: COLORS.primary,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
   primaryBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 14,
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 10,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 6,
   },
   primaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 0.5,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 30,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.surface,
-  },
-  dividerText: {
-    color: COLORS.textSecondary,
-    paddingHorizontal: 16,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 30,
-  },
-  socialBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  socialBtnText: {
-    fontSize: 20,
-    color: COLORS.text,
-    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 40,
   },
   footerText: {
     color: COLORS.textSecondary,

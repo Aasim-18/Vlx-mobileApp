@@ -9,10 +9,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 // Screens
 import Signup from './screens/Signup';
 import Login from './screens/Login';
+import EmailVerify from './screens/EmailVerify';
+import Home from './screens/Home';
 
 export type RootStackPramList = {
   Signup: undefined;
   Login: undefined;
+  EmailVerify: undefined;
+  Home: undefined;
   
 }
 
@@ -31,6 +35,14 @@ function App() {
         <Stack.Screen 
          name='Login'
          component={Login}
+        />
+        <Stack.Screen
+        name='EmailVerify'
+        component={EmailVerify}
+        />
+        <Stack.Screen
+        name='Home'
+        component={Home}
         />
 
         </Stack.Navigator>

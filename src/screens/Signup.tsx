@@ -7,19 +7,17 @@ import axios from 'axios';
 import {NativeStackScreenProps} from "@react-navigation/native-stack"
 import {RootStackPramList} from "../App"
 
-
-
-
-
 type SignupProps = NativeStackScreenProps<RootStackPramList, "Signup">
 
 const COLORS = {
-  primary: '#6C63FF',
-  background: '#0F172A',
-  surface: '#1E293B',
-  text: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  inputBg: '#334155',
+  primary: '#FF9F1C', 
+  background: '#FFFFFF',
+  surface: '#F8F9FA',      
+  text: '#1A1A1A',         
+  textSecondary: '#757575',
+  inputBg: '#FFFFFF',      
+  inputBorder: '#E0E0E0',  
+  shadow: '#000000',
 };
  
 export default function Signup({navigation}: SignupProps) {
@@ -29,8 +27,6 @@ export default function Signup({navigation}: SignupProps) {
   const [password, setPassword] = useState("");
   const [EnrollmentNumber, setEnrollmentNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-
-
 
   const handleSignup = async () => {
     try {
@@ -53,15 +49,8 @@ export default function Signup({navigation}: SignupProps) {
       console.log(error);
       
     }
-
-
-
   }
 
-
-
-
-  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -82,7 +71,8 @@ export default function Signup({navigation}: SignupProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -90,19 +80,18 @@ export default function Signup({navigation}: SignupProps) {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           
-          
           <View style={styles.header}>
             <View style={styles.logoContainer}>
+              {/* Styled to look like the GetKart logo branding */}
               <Text style={styles.logoText}>VLX</Text>
               <View style={styles.logoDot} />
             </View>
             <Text style={styles.welcomeText}>Create Account</Text>
             <Text style={styles.subtitleText}>
-              Join Vlx today and Sell your Products Easily
+              Join VLX today and Sell your Products Easily
             </Text>
           </View>
 
-          
           <Animated.View 
             style={[
               styles.formContainer,
@@ -177,7 +166,6 @@ export default function Signup({navigation}: SignupProps) {
             </TouchableOpacity>
           </Animated.View>
 
-          
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -191,6 +179,7 @@ export default function Signup({navigation}: SignupProps) {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -202,29 +191,29 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 30,
     alignItems: 'center',
   },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   logoText: {
     fontSize: 42,
-    fontWeight: '800',
-    color: COLORS.primary,
-    letterSpacing: 2,
+    fontWeight: '900', 
+    color: COLORS.text, 
+    letterSpacing: -1,
   },
   logoDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.text,
-    marginLeft: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.primary, 
+    marginLeft: 2,
   },
   welcomeText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: COLORS.text,
     marginBottom: 8,
@@ -233,90 +222,62 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
     maxWidth: '80%',
   },
   formContainer: {
     width: '100%',
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-    fontWeight: '500',
+    color: COLORS.text,
+    marginBottom: 6,
+    fontWeight: '600',
+    marginLeft: 4,
   },
   input: {
     backgroundColor: COLORS.inputBg,
-    borderRadius: 12,
+    borderRadius: 12, 
     paddingHorizontal: 16,
     paddingVertical: 14,
     color: COLORS.text,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
+    // Add subtle shadow for depth
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   primaryBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 14,
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 6,
   },
   primaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 0.5,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 30,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.surface,
-  },
-  dividerText: {
-    color: COLORS.textSecondary,
-    paddingHorizontal: 16,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 30,
-  },
-  socialBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  socialBtnText: {
-    fontSize: 20,
-    color: COLORS.text,
-    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 20,
   },
   footerText: {
     color: COLORS.textSecondary,

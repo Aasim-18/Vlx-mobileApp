@@ -17,13 +17,12 @@ import axios from 'axios';
 
 type EmailVerifyProps = NativeStackScreenProps<RootStackPramList, "EmailVerify">;
 
-// GetKart Theme Colors
 const COLORS = {
-  primary: '#FF9F1C',      // GetKart Orange
-  background: '#FFFFFF',   // White
-  text: '#1A1A1A',         // Black
-  textSecondary: '#757575',// Gray
-  inputBg: '#F8F9FA',      // Light Gray for OTP boxes
+  primary: '#FF9F1C',      
+  background: '#FFFFFF',   
+  text: '#1A1A1A',         
+  textSecondary: '#757575',
+  inputBg: '#F8F9FA',      
   border: '#E0E0E0',
   error: '#FF4D4D',
 };
@@ -33,10 +32,10 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   
-  // Refs to handle focus jumping
+  
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
-  // Timer Countdown Logic
+  
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timer > 0) {

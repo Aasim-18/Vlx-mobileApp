@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { COLORS } from '../constants/theme';
 
 export default function HomeHeader() {
   return (
     <View style={styles.header}>
       <View>
-        {/* The Brand Logo */}
-        <Text style={styles.logoText}>
-          Get<Text style={{ color: COLORS.primary }}>Kart</Text>
-        </Text>
+        <Image
+        source={require("./logo.png")}
+        style={{ width: 100, height: 50 }}
+        resizeMode="contain"
+        />
         <Text style={styles.subLogoText}>Sell Fast, Earn Smart</Text>
       </View>
 

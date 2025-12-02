@@ -9,16 +9,7 @@ import {RootStackPramList} from "../App"
 
 type SignupProps = NativeStackScreenProps<RootStackPramList, "Signup">
 
-const COLORS = {
-  primary: '#FF9F1C', 
-  background: '#FFFFFF',
-  surface: '#F8F9FA',      
-  text: '#1A1A1A',         
-  textSecondary: '#757575',
-  inputBg: '#FFFFFF',      
-  inputBorder: '#E0E0E0',  
-  shadow: '#000000',
-};
+
  
 export default function Signup({navigation}: SignupProps) {
 
@@ -105,7 +96,7 @@ export default function Signup({navigation}: SignupProps) {
               <Text style={styles.label}>Full Name</Text>
               <TextInput
                 style={styles.input}
-                placeholder="John Doe"
+                placeholder="Enter your Full Name"
                 placeholderTextColor={COLORS.textSecondary}
                 autoCapitalize="words"
                 onChangeText={setfullName}
@@ -127,7 +118,7 @@ export default function Signup({navigation}: SignupProps) {
               <Text style={styles.label}>Email Address</Text>
               <TextInput
                 style={styles.input}
-                placeholder="name@vnit.ac.in"
+                placeholder="yourEmail@students.vnit.ac.in"
                 placeholderTextColor={COLORS.textSecondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -178,6 +169,18 @@ export default function Signup({navigation}: SignupProps) {
     </SafeAreaView>
   );
 }
+
+
+const COLORS = {
+  primary: '#FF9F1C', 
+  background: '#FFFFFF',
+  surface: '#F8F9FA',      
+  text: '#1A1A1A',         
+  textSecondary: '#757575',
+  inputBg: '#FFFFFF',      
+  inputBorder: '#E0E0E0',  
+  shadow: '#000000',
+};
 
 
 const styles = StyleSheet.create({

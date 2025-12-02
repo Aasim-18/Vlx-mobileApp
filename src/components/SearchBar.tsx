@@ -13,9 +13,7 @@ export default function SearchBar() {
           placeholderTextColor={COLORS.textLight}
         />
       </View>
-      <TouchableOpacity style={styles.filterBtn}>
-        <Text style={{color: '#FFF'}}>⚙️</Text>
-      </TouchableOpacity>
+     
     </View>
   );
 }

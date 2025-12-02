@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert
+  Alert,
 } from 'react-native';
 
 import {NativeStackScreenProps} from "@react-navigation/native-stack"
@@ -20,15 +20,15 @@ import {RootStackPramList} from "../App"
 
 type LoginProps = NativeStackScreenProps<RootStackPramList, "Login">
 
-// UPDATED: GetKart Theme Colors
+
 const COLORS = {
-  primary: '#FF9F1C',      // GetKart Orange
-  background: '#FFFFFF',   // White background
-  surface: '#F8F9FA',      // Light gray
-  text: '#1A1A1A',         // Black/Dark Grey
-  textSecondary: '#757575',// Muted gray
-  inputBg: '#FFFFFF',      // White inputs
-  inputBorder: '#E0E0E0',  // Light border
+  primary: '#FF9F1C',      
+  background: '#FFFFFF',   
+  surface: '#F8F9FA',      
+  text: '#1A1A1A',         
+  textSecondary: '#757575',
+  inputBg: '#FFFFFF',      
+  inputBorder: '#E0E0E0',  
   shadow: '#000000',
 };
 
@@ -60,37 +60,52 @@ export default function LoginScreen({navigation}: LoginProps) {
   }
 
 
-  const generateOtp = async () => {
+
+const generateOtp = async () => {
   
-    if (!email) {
-      Alert.alert("Error", "Please enter your email address.");
-      return false; 
-    }
-
-    try {
-      
-      const response = await axios.post(
-        "https://vlx-server.onrender.com/api/v1/users/Otpgenerate",
-        {  email } 
-      );
-
-      
-    
-      if (response.status === 200 || response.status === 201) {
-        console.log("Server Response:", response.data); 
-        return true; 
-      } else {
-        Alert.alert("Error", "Something went wrong.");
-        return false;
-      }
-
-    } catch (error) {
-    
-      console.log("OTP Error:", error);
-      Alert.alert("Error", "Failed to generate OTP. Please try again.");
-      return false; 
-    }
+  if (!email) {
+    Alert.alert("Invalid Input", "Please enter a valid email address.");
+    return false;
   }
+
+  
+
+
+  try {
+    const response = await axios.post(
+      "https://vlx-server.onrender.com/api/v1/users/Otpgenerate",
+      { email }
+    );
+
+    
+    if (response.status === 200 || response.status === 201) {
+      console.log("OTP Sent:", response.data);
+      
+       
+      return true;
+    } 
+
+  } catch (error: any) {
+    console.log("OTP Error:", error);
+
+    
+    if (error.response) {
+      
+      
+      Alert.alert("Error", error.response.data.message || "Server error occurred.");
+    } else if (error.request) {
+      
+      Alert.alert("Network Error", "Please check your internet connection.");
+    } else {
+      
+      Alert.alert("Error", "An unexpected error occurred.");
+    }
+    return false;
+
+
+  }
+};
+ 
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;

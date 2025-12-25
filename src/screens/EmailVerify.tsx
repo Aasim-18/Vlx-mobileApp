@@ -18,24 +18,25 @@ import axios from 'axios';
 type EmailVerifyProps = NativeStackScreenProps<RootStackPramList, "EmailVerify">;
 
 const COLORS = {
-  primary: '#FF9F1C',      
-  background: '#FFFFFF',   
-  text: '#1A1A1A',         
+  primary: '#FF9F1C',
+  background: '#FFFFFF',
+  text: '#1A1A1A',
   textSecondary: '#757575',
-  inputBg: '#F8F9FA',      
+  inputBg: '#F8F9FA',
   border: '#E0E0E0',
   error: '#FF4D4D',
 };
 
-export default function EmailVerify({ navigation }: EmailVerifyProps) {
+export default function EmailVerify({ navigation, route }: EmailVerifyProps) {
   
+  // 1. Get the email passed from the previous screen
+  const { email } = route.params; 
+
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   
-  
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
-  
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timer > 0) {
@@ -52,7 +53,7 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Auto-focus next input if text is entered
+    // Auto-focus next input
     if (text.length !== 0 && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -66,24 +67,46 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
   };
 
   const handleVerify = async () => {
-    try {
-    const Otp = await axios.post(
-      "https://vlx-server.onrender.com/api/v1/users/verify",
-    )
-    {
-      otp
+    // 2. Combine the array ['1','2','3','4'] into string "1234"
+    const otpString = otp.join('');
+
+    if (otpString.length < 4) {
+      Alert.alert("Error", "Please enter the full 4-digit code");
+      return;
     }
+
+    try {
+      const response = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/verify", 
+        {
+          email: email, // <--- Sending the email we got from params
+          otp: otpString // <--- Sending the joined string
+        },
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      // 3. Only navigate if the server responds with success
+      console.log("Verification Success:", response.data);
+      Alert.alert("Success", "Email Verified Successfully!", [
+        { text: "OK", onPress: () => navigation.navigate("Home") }
+      ]);
       
-    } catch (error) {
-            Alert.alert("Error", "Error While verifing Otp");
-      
+    } catch (error: any) {
+      console.log("Verify Error:", error.response?.data || error.message);
+      const errorMessage = error.response?.data?.message || "Invalid OTP or Server Error";
+      Alert.alert("Verification Failed", errorMessage);
     }
   };
 
   const handleResend = () => {
     if (timer === 0) {
+      // You can add an axios call here to resend the OTP to the 'email'
       setTimer(30);
-      Alert.alert("Code Sent", "A new code has been sent to your email.");
+      Alert.alert("Code Sent", `A new code has been sent to ${email}`);
     }
   };
 
@@ -97,7 +120,6 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
       >
         <View style={styles.content}>
           
-          {/* Header Icon/Text */}
           <View style={styles.header}>
             <View style={styles.iconContainer}>
               <Text style={styles.icon}>✉️</Text>
@@ -105,11 +127,11 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
             <Text style={styles.title}>Verify Email</Text>
             <Text style={styles.subtitle}>
               Please enter the 4-digit code sent to{"\n"}
-              <Text style={styles.emailText}>name@vnit.ac.in</Text>
+              {/* Display the actual email here */}
+              <Text style={styles.emailText}>{email}</Text>
             </Text>
           </View>
 
-          {/* OTP Input Boxes */}
           <View style={styles.otpContainer}>
             {otp.map((digit, index) => (
               <TextInput
@@ -129,7 +151,6 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
             ))}
           </View>
 
-          {/* Verify Button */}
           <TouchableOpacity 
             style={styles.verifyBtn}
             activeOpacity={0.8}
@@ -138,7 +159,6 @@ export default function EmailVerify({ navigation }: EmailVerifyProps) {
             <Text style={styles.verifyBtnText}>Verify Account</Text>
           </TouchableOpacity>
 
-          {/* Resend Timer */}
           <View style={styles.resendContainer}>
             <Text style={styles.resendText}>Didn't receive code? </Text>
             <TouchableOpacity onPress={handleResend} disabled={timer > 0}>

@@ -1,16 +1,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/theme';
+import { House, MessageCircleCode, User, Heart } from 'lucide-react-native';
 
 export default function BottomNavBar() {
   return (
     <View style={styles.bottomNav}>
       <View style={styles.navItem}>
-        <Text style={[styles.navIcon, {color: COLORS.primary}]}>🏠</Text>
-        <Text style={[styles.navLabel, {color: COLORS.primary}]}>Home</Text>
+        <House color="#000" size={24} />
+        <Text style={styles.navLabel}>Home</Text>
       </View>
       <View style={styles.navItem}>
-        <Text style={styles.navIcon}>💬</Text>
+        <MessageCircleCode color="#000" size={24} />
         <Text style={styles.navLabel}>Chat</Text>
       </View>
       
@@ -22,11 +23,11 @@ export default function BottomNavBar() {
       </View>
 
       <View style={styles.navItem}>
-        <Text style={styles.navIcon}>❤️</Text>
+        <Heart color="#000" size={24} />
         <Text style={styles.navLabel}>My Ads</Text>
       </View>
       <View style={styles.navItem}>
-        <Text style={styles.navIcon}>👤</Text>
+        <User color="#000" size={24} />
         <Text style={styles.navLabel}>Profile</Text>
       </View>
     </View>

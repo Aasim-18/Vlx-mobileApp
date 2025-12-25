@@ -1,92 +1,141 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../constants/theme';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { BANNERS } from '../constants/banners';
+
+const { width } = Dimensions.get('window');
+const BANNER_WIDTH = width - 40; 
+
 
 export default function HeroBanner() {
-  return (
-    <View style={styles.bannerContainer}>
-      <View style={styles.bannerContent}>
-         {/* Decorative Circles */}
-         <View style={styles.bannerCirclesLeft}>
-            <View style={[styles.circle, {top: 10, left: 10}]}>
-                <Text style={{fontSize: 20}}>🏠</Text>
-            </View>
-            <View style={[styles.circle, {bottom: 10, right: 10}]}>
-                <Text style={{fontSize: 20}}>💻</Text>
-            </View>
-         </View>
-         
-         <View style={styles.bannerTextContainer}>
-           <Text style={styles.bannerTitle}>BUY & SELL</Text>
-           <Text style={styles.bannerSubtitle}>Anything, Anytime</Text>
-           <Text style={styles.bannerDesc}>Find great deals or list your own items.</Text>
-         </View>
-      </View>
+  const [activeIndex, setActiveIndex] = useState(0);
+  const flatListRef = useRef(null);
+
+  // Auto-slide logic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let nextIndex = activeIndex === BANNERS.length - 1 ? 0 : activeIndex + 1;
       
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+      
+      setActiveIndex(nextIndex);
+    }, 3000); 
+
+    return () => clearInterval(interval);
+  }, [activeIndex]);
+
+  const renderItem = ({ item }: any) => (
+    <View style={[styles.bannerContent, { backgroundColor: item.bgColor }]}>
+      <View style={styles.circlesContainer}>
+        <View style={[styles.circle, styles.circleTop]}>
+          <Text style={styles.emoji}>{item.emoji1}</Text>
+        </View>
+        <View style={[styles.circle, styles.circleBottom]}>
+          <Text style={styles.emoji}>{item.emoji2}</Text>
+        </View>
+      </View>
+
+      <View style={styles.bannerTextContainer}>
+        <Text style={styles.bannerTitle}>{item.title}</Text>
+        <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
+        <Text style={styles.bannerDesc}>{item.desc}</Text>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        ref={flatListRef}
+        data={BANNERS}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        onMomentumScrollEnd={(event) => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / BANNER_WIDTH);
+          setActiveIndex(index);
+        }}
+      />
+
       {/* Pagination Dots */}
       <View style={styles.pagination}>
-        <View style={[styles.dot, styles.activeDot]} />
-        <View style={styles.dot} />
-        <View style={styles.dot} />
+        {BANNERS.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              activeIndex === index ? styles.activeDot : null,
+            ]}
+          />
+        ))}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bannerContainer: {
-    marginHorizontal: 20,
-    marginBottom: 24,
+  container: {
+    marginTop: 10,
+    marginBottom: 20,
   },
   bannerContent: {
-    backgroundColor: COLORS.secondary,
-    borderRadius: 16,
-    height: 180,
+    width: BANNER_WIDTH,
+    marginHorizontal: 20,
+    borderRadius: 24,
+    height: 170,
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
     overflow: 'hidden',
-    position: 'relative',
   },
-  bannerCirclesLeft: {
+  circlesContainer: {
     flex: 1,
-    position: 'relative',
+    height: '100%',
+    justifyContent: 'center',
   },
   circle: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    position: 'absolute',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
   },
+  circleTop: { top: 20, left: 5 },
+  circleBottom: { bottom: 20, right: 0 },
+  emoji: { fontSize: 24 },
   bannerTextContainer: {
     flex: 1.5,
     justifyContent: 'center',
-    paddingRight: 16,
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   bannerTitle: {
     fontSize: 24,
     fontWeight: '900',
-    color: COLORS.primary,
+    color: '#FF9C1A',
     fontStyle: 'italic',
   },
   bannerSubtitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#FFF',
-    marginBottom: 8,
   },
   bannerDesc: {
-    color: '#BDC3C7',
+    color: '#E0E0E0',
     fontSize: 10,
-    textAlign: 'right',
+    textAlign: 'center',
+    marginTop: 5,
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
-    gap: 6,
+    marginTop: 12,
+    gap: 8,
   },
   dot: {
     width: 8,
@@ -95,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1D5DB',
   },
   activeDot: {
-    backgroundColor: COLORS.primary,
-    width: 20,
+    backgroundColor: '#FF9C1A',
+    width: 24,
   },
 });

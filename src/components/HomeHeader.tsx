@@ -14,13 +14,8 @@ export default function HomeHeader() {
         <Text style={styles.subLogoText}>Sell Fast, Earn Smart</Text>
       </View>
 
-      {/* Location Indicator */}
-      <View style={styles.locationContainer}>
-        <Text style={styles.locationText}>Ambazari, Nagpur...</Text>
-        <View style={styles.locationIconCircle}>
-          <Text>📍</Text>
-        </View>
-      </View>
+      
+      
     </View>
   );
 }

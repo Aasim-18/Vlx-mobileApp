@@ -15,119 +15,96 @@ import {
   Alert,
 } from 'react-native';
 
-import {NativeStackScreenProps} from "@react-navigation/native-stack"
-import {RootStackPramList} from "../App"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { RootStackPramList } from "../App"
 
 type LoginProps = NativeStackScreenProps<RootStackPramList, "Login">
 
-
 const COLORS = {
-  primary: '#FF9F1C',      
-  background: '#FFFFFF',   
-  surface: '#F8F9FA',      
-  text: '#1A1A1A',         
+  primary: '#FF9F1C',
+  background: '#FFFFFF',
+  text: '#1A1A1A',
   textSecondary: '#757575',
-  inputBg: '#FFFFFF',      
-  inputBorder: '#E0E0E0',  
-  shadow: '#000000',
+  inputBg: '#FFFFFF',
+  inputBorder: '#E0E0E0',
 };
 
-export default function LoginScreen({navigation}: LoginProps) {
+export default function LoginScreen({ navigation }: LoginProps) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [EnrollmentNumber, setEnrollmentNumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(
-        "https://vlx-server.onrender.com/api/v1/users/login",
-        {
-          email,
-          password,
-          EnrollmentNumber,
-        }
-      );
-      console.log(response);
-      
-      Alert.alert("Success", "You are logged in successfully!", [
-        { text: "OK" },
-      ]);
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Login failed. Please check your credentials.");
-    }
-  }
-
-
-
-const generateOtp = async () => {
-  
-  if (!email) {
-    Alert.alert("Invalid Input", "Please enter a valid email address.");
-    return false;
-  }
-
-  
-
-
-  try {
-    const response = await axios.post(
-      "https://vlx-server.onrender.com/api/v1/users/Otpgenerate",
-      { email }
-    );
-
-    
-    if (response.status === 200 || response.status === 201) {
-      console.log("OTP Sent:", response.data);
-      
-       
-      return true;
-    } 
-
-  } catch (error: any) {
-    console.log("OTP Error:", error);
-
-    
-    if (error.response) {
-      
-      
-      Alert.alert("Error", error.response.data.message || "Server error occurred.");
-    } else if (error.request) {
-      
-      Alert.alert("Network Error", "Please check your internet connection.");
-    } else {
-      
-      Alert.alert("Error", "An unexpected error occurred.");
-    }
-    return false;
-
-
-  }
-};
- 
-  
+  // Animation Refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
     ]).start();
   }, []);
 
+  // --- MERGED LOGIC FUNCTION ---
+  const handleLoginAndSendOtp = async () => {
+    // 1. Validation
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      
+      const loginResponse = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/login",
+        {
+          email: email.toLowerCase().trim(), // Always sanitize email
+          password,
+          EnrollmentNumber,
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Login Success:", loginResponse.data);
+
+      // 3. SECOND: If Login worked, Send the OTP
+      // (Only needed if your /login endpoint doesn't send it automatically)
+      const otpResponse = await axios.post(
+        "https://vlx-server.onrender.com/api/v1/users/generateotp",
+        { email: email.toLowerCase().trim() },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("OTP Sent:", otpResponse.data);
+
+      
+      Alert.alert("Success", "OTP sent to your email!", [
+        {
+          text: "Enter OTP",
+          onPress: () => {
+            
+            navigation.navigate("EmailVerify", { 
+              email: email 
+            } );
+          }
+        }
+      ]);
+
+    } catch (error: any) {
+      console.log("Login Flow Error:", error);
+      const msg = error.response?.data?.message || "Login failed. Check internet or credentials.";
+      Alert.alert("Error", msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Updated Status Bar for Light Theme */}
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
       
       <KeyboardAvoidingView 
@@ -136,7 +113,6 @@ const generateOtp = async () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           
-          {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Text style={styles.logoText}>VLX</Text>
@@ -148,14 +124,10 @@ const generateOtp = async () => {
             </Text>
           </View>
 
-          {/* Form */}
           <Animated.View 
             style={[
               styles.formContainer,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }]
-              }
+              { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
             ]}
           >
             <View style={styles.inputGroup}>
@@ -167,6 +139,7 @@ const generateOtp = async () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 onChangeText={setEmail}
+                value={email}
               />
             </View>
 
@@ -178,6 +151,7 @@ const generateOtp = async () => {
                 placeholderTextColor={COLORS.textSecondary}
                 autoCapitalize="none"
                 onChangeText={setEnrollmentNumber}
+                value={EnrollmentNumber}
               />
             </View>
 
@@ -189,10 +163,10 @@ const generateOtp = async () => {
                 placeholderTextColor={COLORS.textSecondary}
                 secureTextEntry
                 onChangeText={setPassword}
+                value={password}
               />
             </View>
 
-            {/* Forgot Password Link */}
             <TouchableOpacity style={{alignSelf: 'flex-end', marginBottom: 20}}>
                 <Text style={styles.forgotText}>Forgot Password?</Text>
             </TouchableOpacity>
@@ -200,19 +174,16 @@ const generateOtp = async () => {
             <TouchableOpacity 
               style={styles.primaryBtn}
               activeOpacity={0.8}
-              onPress={async () => {
-                await handleLogin();
-               await  generateOtp();
-
-                navigation.navigate("EmailVerify");
-              }}
+              onPress={handleLoginAndSendOtp} // Call the unified function
+              disabled={loading}
             >
-              <Text style={styles.primaryBtnText}>Sign In</Text>
+              <Text style={styles.primaryBtnText}>
+                {loading ? "Verifying..." : "Sign In"}
+              </Text>
             </TouchableOpacity>
 
           </Animated.View>
 
-          {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
@@ -225,7 +196,6 @@ const generateOtp = async () => {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

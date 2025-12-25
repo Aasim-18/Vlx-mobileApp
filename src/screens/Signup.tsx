@@ -17,7 +17,7 @@ export default function Signup({navigation}: SignupProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [EnrollmentNumber, setEnrollmentNumber] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleSignup = async () => {
     try {
@@ -27,15 +27,21 @@ export default function Signup({navigation}: SignupProps) {
           fullName,
           email,
           password,
-          EnrollmentNumber,
-          phoneNumber,
+          EnrollmentNumber, 
+          phone,
+        },
+        
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
         }
       );
-        console.log(response);
-        
-      Alert.alert("Success", "Account created successfully!", [
-        { text: "OK" },
-      ]);
+      
+      // Only navigate if success
+      console.log(response.data);
+      Alert.alert("Success", "Account created successfully!");
+      navigation.navigate('Login');
     } catch (error) {
       console.log(error);
       
@@ -133,7 +139,7 @@ export default function Signup({navigation}: SignupProps) {
                 placeholderTextColor={COLORS.textSecondary}
                 keyboardType="phone-pad"
                 autoCapitalize="none"
-                onChangeText={setPhoneNumber}
+                onChangeText={setPhone}
               />
             </View>
 
@@ -151,7 +157,10 @@ export default function Signup({navigation}: SignupProps) {
             <TouchableOpacity 
               style={styles.primaryBtn}
               activeOpacity={0.8}
-              onPress={handleSignup}
+              onPress={async () => {
+               await handleSignup()
+                
+              }}
             >
               <Text style={styles.primaryBtnText}>Sign Up</Text>
             </TouchableOpacity>
